@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Thêm viewport để tối ưu hóa di động -->
+    <title>越南语听力练习</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding-bottom: 300px; /* Mặc định cho màn hình lớn */
+            background-color: #f7fbf3; /*f7fbf3  3f4040*/
+        }
+        #gameContainer {
+            display: block;
+            min-height: calc(100vh - 150px); /* Đảm bảo nội dung chiếm đủ chiều cao màn hình */
+        }
+        #infoBox { 
+            width: 95%; 
+            max-width: 700px;
+            min-height: 100px; 
+            margin: 0 auto; 
+            border: 2px solid #91b66f; /*041b31 1f4263*/
+            background: #85ae5f; /*ecf2e4 fefefc*/
+            color: #ffffff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: clamp(40px, 5vw, 60px);
+            font-weight: bold;
+        }
+        #contactBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 2px solid #91b66f; 
+            background: #85ae5f; 
+            color: #f1c232; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #instructionBox { 
+            width: 90%; 
+            max-width: 700px;
+            min-height: 25px; 
+            margin: 0px auto; 
+            border: 2px solid #91b66f; 
+            background: #85ae5f; 
+            color: #f7e19c; 
+            display: flex; 
+            align-items: center; 
+            justify-content: left; 
+            padding-left: 20px;
+            font-size: clamp(16px, 2vw, 20px); 
+            font-weight: bold;
+        }
+        #controls { 
+            position: fixed; /* Cố định ở cuối màn hình */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 800px; /* Giới hạn chiều rộng tối đa */
+            background: #f7fbf3;
+                        border: 3px solid #f7fbf3;                        
+            padding: 10px 0; 
+           /* box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); */
+            z-index: 1000; 
+        }
+        #controls div {
+            margin: 5px 0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        button { 
+            padding: 8px 8px; 
+            margin: 0 5px; 
+            cursor: pointer; 
+            border: 2px solid #85ae5f; 
+            background: #85ae5f; /*192332*/
+                        box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+            color: #fffbef; 
+            font-size: 28px; 
+            border-radius: 5px; 
+        }
+        #sentenceNumber { 
+            width: 50px; 
+            padding: 10px; 
+            text-align: center; 
+            border: 3px solid #85ae5f; /*041b31 68838B*/
+            background: #f1cc76; 
+            color: #000; 
+            border-radius: 10px; 
+            font-size: 16px; 
+            -moz-appearance: textfield; 
+        }
+        #sentenceNumber::-webkit-inner-spin-button, 
+        #sentenceNumber::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        #sentenceNumber:disabled { 
+            background: #eee; 
+        }
+        .disabled { 
+            cursor: not-allowed; 
+            pointer-events: none; 
+        }
+        .active-mode { 
+            border: 2px solid #fed16a; 
+        }
+        #indicator { 
+            width: 95%;
+                        max-width: 700px; 
+            min-height: 50px; 
+            margin: 10px auto; 
+                        padding: 5px;
+            border: 3px solid #fed16a; 
+            background: #ffffe0; 
+            border-radius: 10px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        #optionsContainer {
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto;
+        }
+        .optionBtn {
+            width: 95%; 
+            max-width: 700px;
+            padding: 10px;
+            margin: 5px 0;
+            border: 2px solid #ffffff;
+            background: #ffffff; /*E6EDD9*/
+            color: #000000;
+                        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 30px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .optionBtn:hover {
+            background: #D2E4C4;
+        }
+        .correct {
+            background: #B7D7AA !important;
+        }
+        .wrong {
+            background: #CE6D5E !important;
+        }
+        #score { 
+            display: none; 
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto; 
+            color: #FF6820; 
+            font-size: 30px; 
+            text-align: center;
+        }
+        #wrongSentences { 
+            display: none; 
+            width: 95%; 
+            max-width: 700px; 
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #CE6D5E; 
+            background: #FFF0F0; 
+            color: #CE6D5E; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+        }
+        #results { 
+            display: none; 
+            width: 95%;
+            max-width: 700px;        
+            margin: 10px auto; 
+            padding: 10px; 
+            border: 2px solid #734A2E; 
+            background: #fffbef; 
+            color: #000; 
+            font-size: 30px; 
+            text-align: left; 
+            border-radius: 5px; 
+            white-space: pre-line;
+        }
+
+        /* Media query cho thiết bị di động */
+        @media (max-width: 768px) {
+            body {
+                padding-bottom: 200px; /* Giảm padding-bottom cho điện thoại */
+            }
+            #controls {
+                padding: 5px 0; /* Giảm padding */
+            }
+            button {
+                padding: 6px 6px; /* Giảm kích thước nút */
+                font-size: 20px; /* Giảm kích thước chữ */
+            }
+            #sentenceNumber {
+                width: 40px; /* Giảm chiều rộng */
+                padding: 8px; /* Giảm padding */
+                font-size: 14px; /* Giảm kích thước chữ */
+            }
+            .optionBtn {
+                font-size: 20px; /* Giảm kích thước chữ cho đáp án */
+                padding: 8px; /* Giảm padding */
+            }
+            #infoBox {
+                font-size: clamp(30px, 4vw, 40px); /* Giảm kích thước chữ */
+            }
+            #contactBox, #instructionBox {
+                font-size: clamp(14px, 2vw, 16px); /* Giảm kích thước chữ */
+            }
+            #indicator {
+                min-height: 40px; /* Giảm chiều cao tối thiểu */
+            }
+            #results, #wrongSentences, #score {
+                font-size: 24px; /* Giảm kích thước chữ */
+                                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="infoBox">习得越南语<br>听力练习</div>
+        <div id="contactBox">讲师-阮玉煌 | Weixin：XiDeYueNanYu</div>
+        <div id="instructionBox">选择与播放内容相符的选项</div>
+        <div id="indicator"></div>
+        <div id="optionsContainer"></div>
+        <div id="results"></div>
+        <div id="score">0/0</div>
+        <div id="wrongSentences"></div>
+    </div>
+    <div id="controls">
+        <div>
+            <button id="freeModeBtn" class="active-mode">自由模式</button>
+            <button id="testModeBtn">作业模式</button>
+        </div>
+        <div>
+            <button id="autoContinueBtn">自动继续</button>
+            <button id="showHideBtn">显示-隐藏</button>
+        </div>
+        <div>
+            <button id="prevBtn">◀</button>
+            <input type="text" id="sentenceNumber" inputmode="numeric" pattern="[0-9]*">
+            <button id="nextBtn">▶</button>
+            <button id="replayBtn">再听一遍</button>
+        </div>
+    </div>
+    <audio id="mainAudio" src="audio.mp3"></audio>
+    <audio id="correctAudio" src="Dung.mp3"></audio>
+    <audio id="wrongAudio" src="Sai.mp3"></audio>
+
+    <script>
+        const audio = document.getElementById('mainAudio');
+        const correctAudio = document.getElementById('correctAudio');
+        const wrongAudio = document.getElementById('wrongAudio');
+        const indicator = document.getElementById('indicator');
+        const sentenceNumber = document.getElementById('sentenceNumber');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const replayBtn = document.getElementById('replayBtn');
+        const freeModeBtn = document.getElementById('freeModeBtn');
+        const testModeBtn = document.getElementById('testModeBtn');
+        const autoContinueBtn = document.getElementById('autoContinueBtn');
+        const showHideBtn = document.getElementById('showHideBtn');
+        const scoreDisplay = document.getElementById('score');
+        const wrongSentencesDisplay = document.getElementById('wrongSentences');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const resultsDisplay = document.getElementById('results');
+
+        const buttons = [prevBtn, nextBtn, replayBtn, freeModeBtn, testModeBtn, autoContinueBtn, showHideBtn];
+
+const sentences = [
+    {
+        "audioFile": "audio.mp3",
+        "start": 0.555708,
+        "end": 1.815708,
+        "correctAnswer": "Một con hổ.",
+        "translation": "一只老虎。",
+        "options": [
+            "Một con hộ.",
+            "Một con hô.",
+            "Một còn hổ.",
+            "Một con hổ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 2.535708,
+        "end": 3.835708,
+        "correctAnswer": "Hai con gà.",
+        "translation": "两只鸡。",
+        "options": [
+            "Hai con cá.",
+            "Hai côn gà.",
+            "Hai con gá.",
+            "Hai con gà."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 4.465708,
+        "end": 5.645708,
+        "correctAnswer": "Ba con vịt.",
+        "translation": "三只鸭子。",
+        "options": [
+            "Ba con vết.",
+            "Ba còn vịt.",
+            "Ba con vít.",
+            "Ba con vịt."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 6.255708,
+        "end": 7.465708,
+        "correctAnswer": "Bốn con lợn.",
+        "translation": "四只猪。",
+        "options": [
+            "Bốn con lơn.",
+            "Bốn còn lợn.",
+            "Bốn con lượt.",
+            "Bốn con lợn."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 8.045708,
+        "end": 9.375708,
+        "correctAnswer": "Năm con thỏ.",
+        "translation": "五只兔子。",
+        "options": [
+            "Nam con thỏ.",
+            "Năm còn thỏ.",
+            "Năm con thó.",
+            "Năm con thỏ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 9.975708,
+        "end": 11.365708,
+        "correctAnswer": "Sáu con voi.",
+        "translation": "六只大象。",
+        "options": [
+            "Sáu còn voi.",
+            "Sáu con vôi.",
+            "Sáu côn voi.",
+            "Sáu con voi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 11.955708,
+        "end": 13.155708,
+        "correctAnswer": "Bảy con cá.",
+        "translation": "七条鱼。",
+        "options": [
+            "Bảy con gá.",
+            "Bảy còn cá.",
+            "Bảy con cá.",
+            "Bải con cá."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 13.785708,
+        "end": 15.065708,
+        "correctAnswer": "Tám con chó.",
+        "translation": "八只狗。",
+        "options": [
+            "Tám côn chó.",
+            "Tám con chỏ.",
+            "Tam con chó.",
+            "Tám con chó."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 15.645708,
+        "end": 17.005708,
+        "correctAnswer": "Chín con mèo.",
+        "translation": "九只猫。",
+        "options": [
+            "Chính con mèo.",
+            "Chín còn mèo.",
+            "Chín con méo.",
+            "Chín con mèo."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 17.615708,
+        "end": 18.975708,
+        "correctAnswer": "Mười con trâu.",
+        "translation": "十只水牛。",
+        "options": [
+            "Mười con trấu.",
+            "Mười côn trâu.",
+            "Mười còn trâu.",
+            "Mười con trâu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 19.485708,
+        "end": 21.025708,
+        "correctAnswer": "Mười một con bò.",
+        "translation": "十一只牛。",
+        "options": [
+            "Mười một côn bò.",
+            "Mười một còn bò.",
+            "Mười một con bồ.",
+            "Mười một con bò."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 21.715708,
+        "end": 23.305708,
+        "correctAnswer": "Mười hai con dê.",
+        "translation": "十二只山羊。",
+        "options": [
+            "Mười hai con dế.",
+            "Mười hai côn dê.",
+            "Mười hai còn dê.",
+            "Mười hai con dê."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 23.925708,
+        "end": 25.445708,
+        "correctAnswer": "Mười bốn con tôm.",
+        "translation": "十四只虾。",
+        "options": [
+            "Mười bốn còn tôm.",
+            "Mười bốn con tôm.",
+            "Mười bốn con tôn.",
+            "Mười bốn côn tôm."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 26.245708,
+        "end": 27.675708,
+        "correctAnswer": "Mười lăm con chuột.",
+        "translation": "十五只老鼠。",
+        "options": [
+            "Mười lăm còn chuột.",
+            "Mười lam con chuột.",
+            "Mười lăm con chuốc.",
+            "Mười lăm con chuột."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 28.365708,
+        "end": 30.365708,
+        "correctAnswer": "Hai mươi quả dưa hấu.",
+        "translation": "二十个西瓜。",
+        "options": [
+            "Hai mươi quả dưa hậu.",
+            "Hai mươi quả đưa hấu.",
+            "Hai mươi quả dưa hấu.",
+            "Hai mươi quả xưa hấu."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 31.165708,
+        "end": 32.935708,
+        "correctAnswer": "Hai mươi mốt quả cam.",
+        "translation": "二十一个橙子。",
+        "options": [
+            "Hai mươi mốt quả càm.",
+            "Hai mươi một quả cam.",
+            "Hai mươi mốt quả cam.",
+            "Hai mươi mốt quà cam."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 33.905708,
+        "end": 35.795708,
+        "correctAnswer": "Hai mươi hai quả táo.",
+        "translation": "二十二个苹果。",
+        "options": [
+            "Hai mươi hai quả tảo.",
+            "Hai mươi hai quả táo.",
+            "Hai mươi hai quả thảo.",
+            "Hai mươi hai quà táo."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 36.565708,
+        "end": 38.455708,
+        "correctAnswer": "Hai mươi tư quả chuối.",
+        "translation": "二十四根香蕉。",
+        "options": [
+            "Hai mươi tư quả chuổi.",
+            "Hai mươi tư quả chối.",
+            "Hai mươi tư quà chuối.",
+            "Hai mươi tư quả chuối."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 39.265708,
+        "end": 41.375708,
+        "correctAnswer": "Hai mươi lăm củ cà rốt.",
+        "translation": "二十五根胡萝卜。",
+        "options": [
+            "Hai mươi lăm củ cá rốt.",
+            "Hai mươi lam củ cà rốt.",
+            "Hai mươi lăm củ cà rót.",
+            "Hai mươi lăm củ cà rốt."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 42.235708,
+        "end": 44.245708,
+        "correctAnswer": "Ba mươi tư chiếc xe.",
+        "translation": "三十四辆车。",
+        "options": [
+            "Ba mươi tư chiếc xê.",
+            "Ba mười tư chiếc xe.",
+            "Ba mươi tứ chiếc xe.",
+            "Ba mươi tư chiếc xe."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 45.095708,
+        "end": 46.995708,
+        "correctAnswer": "Bốn mươi bốn quyển sách.",
+        "translation": "四十四本书。",
+        "options": [
+            "Bốn mươi bốn quyển sắc.",
+            "Bốn mươi tư quyển sách.",
+            "Bốn mươi bốn quyển xách.",
+            "Bốn mươi bốn quyển sách."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 47.665708,
+        "end": 49.785708,
+        "correctAnswer": "Bốn mươi tư quyển từ điển.",
+        "translation": "四十四本词典。",
+        "options": [
+            "Bốn mươi tư quyển từ diện.",
+            "Bốn mươi bốn quyển từ điển.",
+            "Bốn mươi tư quyến từ điển.",
+            "Bốn mươi tư quyển từ điển."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 50.495708,
+        "end": 52.125708,
+        "correctAnswer": "Một trăm quả trứng.",
+        "translation": "一百个鸡蛋。",
+        "options": [
+            "Một chằm quả trứng.",
+            "Một trăm quả trưng.",
+            "Một trăm quà trứng.",
+            "Một trăm quả trứng."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 52.575708,
+        "end": 54.755708,
+        "correctAnswer": "Một trăm linh một quả nho.",
+        "translation": "一百零一个葡萄。",
+        "options": [
+            "Một trăm linh một quả nho.",
+            "Một trăm lình một quả nho.",
+            "Một trăm linh một quả nhô.",
+            "Một trăm linh một quả no."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 55.335708,
+        "end": 57.545708,
+        "correctAnswer": "Một trăm lẻ một quả nho.",
+        "translation": "一百零一个葡萄。",
+        "options": [
+            "Một trăm lẻ một quả nhô.",
+            "Một trăm lẻ một quả no.",
+            "Một trăm lẹ một quả nho.",
+            "Một trăm lẻ một quả nho."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 58.125708,
+        "end": 60.455708,
+        "correctAnswer": "Một trăm lẻ năm quả dừa.",
+        "translation": "一百零五个椰子。",
+        "options": [
+            "Một trăm lẹ năm quả dừa.",
+            "Một trăm lẻ năm quả dưa.",
+            "Một trăm lẻ lam quả dừa.",
+            "Một trăm lẻ năm quả dừa."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 60.995708,
+        "end": 63.065708,
+        "correctAnswer": "Một trăm mười lăm bông hoa.",
+        "translation": "一百一十五朵花。",
+        "options": [
+            "Một trăm mười lam bông hoa.",
+            "Một trăm mười lăm bóng hoa.",
+            "Một trăm mười năm bông hoa.",
+            "Một trăm mười lăm bông hoa."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 63.695708,
+        "end": 65.935708,
+        "correctAnswer": "Một nghìn cái điện thoại di động.",
+        "translation": "一千部手机。",
+        "options": [
+            "Một nghìn cái điển thoại di động.",
+            "Một nghìn cái điện thoại dì động.",
+            "Một nghìn cái điện thoại di đọng.",
+            "Một nghìn cái điện thoại di động."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 66.785708,
+        "end": 69.625708,
+        "correctAnswer": "Hai nghìn không trăm lẻ một chiếc xe đạp.",
+        "translation": "两千零一辆自行车。",
+        "options": [
+            "Hai nghìn không trăm lẻ một chiếc che đạp.",
+            "Hai nghìn không trăm lẻ một chiếc xe đáp.",
+            "Hai nghìn không trăm lẻ một chiếc xe đạp.",
+            "Hai nghìn không trăm lẹ một chiếc xe đạp."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 70.535708,
+        "end": 73.605708,
+        "correctAnswer": "Ba nghìn một trăm linh bốn cái đồng hồ.",
+        "translation": "三千一百零四块手表。",
+        "options": [
+            "Ba nghìn một trăm linh bốn cái đồng hồ.",
+            "Ba nghìn một châm linh bốn cái đồng hồ.",
+            "Ba nghìn một trăm linh bốn cái dòng hồ.",
+            "Ba nghìn một trăm linh bốn cái đồng hố."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 74.365708,
+        "end": 77.785708,
+        "correctAnswer": "Bốn nghìn hai trăm lẻ năm tấm vé xem phim.",
+        "translation": "四千二百零五张电影票。",
+        "options": [
+            "Bốn nghìn hai trăm lẻ năm tấm vé xem phin.",
+            "Bốn nghìn hai trăm lẻ năm tấm vê xem phim.",
+            "Bốn nghìn hai trăm lẻ năm tấm vé xem phim.",
+            "Bốn nghìn hai trăm lẹ năm tấm vé xem phim."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 78.805708,
+        "end": 81.395708,
+        "correctAnswer": "Năm nghìn ba trăm mười lăm tấm ảnh.",
+        "translation": "五千三百一十五张照片。",
+        "options": [
+            "Năm nghìn ba trăm mười lăm tấm ảnh.",
+            "Năm nghìn ba trăm mười lam tấm ảnh.",
+            "Năm nghìn ba trăm mười lăm tâm ảnh.",
+            "Năm nghìn ba trăm mười lăm tấm ãnh."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 82.085708,
+        "end": 85.235708,
+        "correctAnswer": "Sáu nghìn bốn trăm hai mươi mốt tờ báo.",
+        "translation": "六千四百二十一份报纸。",
+        "options": [
+            "Sáu nghìn bốn trăm hai mươi mốt tờ báo.",
+            "Sáu nghìn bốn trăm hai mươi mốt tờ bão.",
+            "Sáu nghìn bốn trăm hai mươi một tờ báo.",
+            "Sáu nghìn bốn trăm hai mươi mốt tờ báp."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 85.895708,
+        "end": 88.645708,
+        "correctAnswer": "Bảy nghìn năm trăm hai mươi tư chiếc bút.",
+        "translation": "七千五百二十四支笔。",
+        "options": [
+            "Bảy nghìn năm trăm hai mươi tư chiếc bút.",
+            "Bảy nghìn năm trăm hai mươi tư chiệc bút.",
+            "Bảy nghìn năm trăm hai mươi tư chiếc bụt.",
+            "Bảy nghìn năm trăm hai mươi thư chiếc bút."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 89.515708,
+        "end": 92.575708,
+        "correctAnswer": "Tám nghìn sáu trăm hai mươi bốn cái kéo.",
+        "translation": "八千六百二十四把剪刀。",
+        "options": [
+            "Tám nghìn sáu trăm hai mươi bốn cái kéo.",
+            "Tám nghìn sáu trăm hai mươi bốn cái kèo.",
+            "Tám nghìn sáu chăm hai mươi bốn cái kéo.",
+            "Tám nghìn sáu trăm hai mươi bố cái kéo."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 93.265708,
+        "end": 96.025708,
+        "correctAnswer": "Chín nghìn bảy trăm hai mươi lăm cái cốc.",
+        "translation": "九千七百二十五个杯子。",
+        "options": [
+            "Chín nghìn bảy trăm hai mươi lăm cái cốk.",
+            "Chín nghìn bảy trăm hai mươi lăm cái cốc.",
+            "Chín nghìn bảy châm hai mươi lăm cái cốc.",
+            "Chín nghìn bảy trăm hai mươi lam cái cốc."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 96.875708,
+        "end": 98.565708,
+        "correctAnswer": "Mười nghìn cái mũ.",
+        "translation": "一万顶帽子。",
+        "options": [
+            "Mười nghìn cái mủ.",
+            "Mười nghìn cái mũ.",
+            "Mười nghìn cái mụ.",
+            "Mười nghin cái mũ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 99.105708,
+        "end": 101.985708,
+        "correctAnswer": "Một triệu không trăm linh năm chiếc túi xách.",
+        "translation": "一百万零五个手提包。",
+        "options": [
+            "Một triệu không trăm linh năm chiếc túi xách.",
+            "Một triệu không trăm linh năm chiếc túy xách.",
+            "Một triệu không trăm linh năm chiếc túi sach.",
+            "Một triệu không trăm linh nam chiếc túi xách."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 102.695708,
+        "end": 105.265708,
+        "correctAnswer": "Hai triệu không trăm mười lăm cái đèn.",
+        "translation": "两百万零一百一十五盏灯。",
+        "options": [
+            "Hai triệu không trăm mười lăm cái đèn.",
+            "Hai triệu khong trăm mười lăm cái đèn.",
+            "Hai triệu không trăm mười lăm cái đen.",
+            "Hai triệu không trăm mười lam cái đèn."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 106.025708,
+        "end": 109.675708,
+        "correctAnswer": "Ba triệu một nghìn không trăm linh tư cái máy vi tính.",
+        "translation": "三百零一万零四台电脑。",
+        "options": [
+            "Ba triệu một nghìn không trăm linh tư cái máy vi tính.",
+            "Ba triệu một nghìn không trăm linh tư cái may vi tính.",
+            "Ba triệu một nghìn không trăm linh tứ cái máy vi tính.",
+            "Ba triệu một nghìn không tram linh tư cái máy vi tính."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 110.495708,
+        "end": 114.285708,
+        "correctAnswer": "Một tỷ Một triệu một trăm mười một quyển sách.",
+        "translation": "十亿一百万一百一十一本书。",
+        "options": [
+            "Một tỷ Một trệu một trăm mười một quyển sách.",
+            "Một tỷ Một trệu một trăm mười một quyền sách.",
+            "Một tỷ Một triệu một trăm mười một quyển sách.",
+            "Một tỷ Một triệu một trăm mười một quyển sắch."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 115.155708,
+        "end": 117.385708,
+        "correctAnswer": "Anh ấy có ô tô không?",
+        "translation": "他有汽车吗？",
+        "options": [
+            "Anh ấy có ô tô khong?",
+            "Anh ẩy có ô tô không?",
+            "Anh ấy có ô tô không?",
+            "Anh ấy có ô tô khống?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 117.815708,
+        "end": 120.445708,
+        "correctAnswer": "Có, anh ấy có ô tô.",
+        "translation": "有，他有汽车。",
+        "options": [
+            "Có, anh ấy có ô tô.",
+            "Có, anh ấy có ô tồ.",
+            "Có, anh ấy có ồ tô.",
+            "Có, anh ấy có ô thô."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 120.975708,
+        "end": 123.135708,
+        "correctAnswer": "Chị ấy có xe máy không?",
+        "translation": "(阿)姐有摩托车吗？",
+        "options": [
+            "Chị ấy có xe máy khong?",
+            "Chị ấy có xe mái không?",
+            "Chị ấy có xẹ máy không?",
+            "Chị ấy có xe máy không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 123.605708,
+        "end": 126.435708,
+        "correctAnswer": "Không, chị ấy không có xe máy.",
+        "translation": "没有，(阿)姐没有摩托车。",
+        "options": [
+            "Không, chị ấy không có xe mái.",
+            "Không, chị ấy không có xe máy.",
+            "Không, chị ấy khong có xe máy.",
+            "Không, chị ấy không có xẹ máy."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 127.165708,
+        "end": 128.745708,
+        "correctAnswer": "Có mấy con chó?",
+        "translation": "有几只狗？",
+        "options": [
+            "Có mấy con chó?",
+            "Có mấy côn chó?",
+            "Có mấy con chõ?",
+            "Có mẩy con chó?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 129.225708,
+        "end": 130.935708,
+        "correctAnswer": "Có một con chó.",
+        "translation": "有一只狗。",
+        "options": [
+            "Có một con chó.",
+            "Có một côn chó.",
+            "Có một con chố.",
+            "Có một con chỏ."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 131.655708,
+        "end": 133.295708,
+        "correctAnswer": "Có mấy con mèo?",
+        "translation": "有几只猫？",
+        "options": [
+            "Có mấy còn mèo?",
+            "Có mấy con mẻo?",
+            "Có mấy con mèo?",
+            "Gò mấy con mèo?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 133.795708,
+        "end": 135.465708,
+        "correctAnswer": "Có hai con mèo.",
+        "translation": "有两只猫。",
+        "options": [
+            "Có hai con mèo.",
+            "Có hai còn mèo.",
+            "Có hay con mèo.",
+            "Có hai con méo."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 136.315708,
+        "end": 137.955708,
+        "correctAnswer": "Có mấy con gà?",
+        "translation": "有几只鸡？",
+        "options": [
+            "Có mấy con gà?",
+            "Có mẩy con gà?",
+            "Có mấy còn gà?",
+            "Có mấy con gá?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 138.485708,
+        "end": 140.155708,
+        "correctAnswer": "Có chín con gà.",
+        "translation": "有九只鸡。",
+        "options": [
+            "Có chín con gà.",
+            "Có chín còn gà.",
+            "Có chín con gá.",
+            "Có chím con gà."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 141.045708,
+        "end": 142.885708,
+        "correctAnswer": "Có bao nhiêu chiếc xe?",
+        "translation": "有多少辆车？",
+        "options": [
+            "Có bao nhiêu chiệc xe?",
+            "Có bao nhiêu chiếc xe?",
+            "Gò bao nhiêu chiếc xe?",
+            "Có bao niêu chiếc xe?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 143.355708,
+        "end": 145.135708,
+        "correctAnswer": "Có mười chiếc xe.",
+        "translation": "有十辆车。",
+        "options": [
+            "Có mười chiếc xé.",
+            "Có mươi chiếc xe.",
+            "Cô mười chiếc xe.",
+            "Có mười chiếc xe."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 145.745708,
+        "end": 148.055708,
+        "correctAnswer": "Có bao nhiêu chiếc điện thoại di động.",
+        "translation": "有多少部手机？",
+        "options": [
+            "Có bào nhiêu chiếc điện thoại di động.",
+            "Có bao nhiêu chiếc điển thoại di động.",
+            "Có bao nhiêu chiếc điện thoại đi động.",
+            "Có bao nhiêu chiếc điện thoại di động."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 148.905708,
+        "end": 151.365708,
+        "correctAnswer": "Có mười lăm chiếc điện thoại di động.",
+        "translation": "有十五部手机。",
+        "options": [
+            "Có mười lam chiếc điện thoại di động.",
+            "Có mười lăm chiếc điển thoại di động.",
+            "Có mười lăm chiếc điện thoại đi động.",
+            "Có mười lăm chiếc điện thoại di động."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 152.685708,
+        "end": 154.945708,
+        "correctAnswer": "Chiếc máy tính này của ai?",
+        "translation": "这台电脑是谁的？",
+        "options": [
+            "Chiếc mạy tính này của ai?",
+            "Chiếc máy tính này cửa ai?",
+            "Chiếc máy tỉnh này của ai?",
+            "Chiếc máy tính này của ai?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 155.435708,
+        "end": 157.625708,
+        "correctAnswer": "Chiếc máy tính này của tôi.",
+        "translation": "这台电脑是我的。",
+        "options": [
+            "Chiếc máy tính nầy của tôi.",
+            "Chiếc mạy tính này của tôi.",
+            "Chiếc máy tính này cửa tôi.",
+            "Chiếc máy tính này của tôi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 158.615708,
+        "end": 160.905708,
+        "correctAnswer": "Cái bút này của anh phải không?",
+        "translation": "这支笔是你的吗？",
+        "options": [
+            "Cái bút này của anh phái không?",
+            "Cái bụt này của anh phải không?",
+            "Cái bút này của an phải không?",
+            "Cái bút này của anh phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 161.355708,
+        "end": 163.935708,
+        "correctAnswer": "Đúng, cái bút ấy của tôi.",
+        "translation": "对，那支笔是我的。",
+        "options": [
+            "Đúng, cái bút ấy cửa tôi.",
+            "Đúng, cái bút ẩy của tôi.",
+            "Đúng, cái bụt ấy của tôi.",
+            "Đúng, cái bút ấy của tôi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 164.845708,
+        "end": 167.535708,
+        "correctAnswer": "Cái xe kia của anh có phải không?",
+        "translation": "那辆车是你的吗？",
+        "options": [
+            "Cái xe kia của anh có phái không?",
+            "Cái xê kia của anh có phải không?",
+            "Cái xe kia của an có phải không?",
+            "Cái xe kia của anh có phải không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 167.965708,
+        "end": 170.895708,
+        "correctAnswer": "Không, cái xe ấy không phải của tôi.",
+        "translation": "不是，那辆车不是我的。",
+        "options": [
+            "Không, cái xe ẩy không phải của tôi.",
+            "Khong, cái xe ấy không phải của tôi.",
+            "Không, cái xê ấy không phải của tôi.",
+            "Không, cái xe ấy không phải của tôi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 171.985708,
+        "end": 174.525708,
+        "correctAnswer": "Có phải ngôi nhà ấy của bạn không?",
+        "translation": "那栋房子是你的吗？",
+        "options": [
+            "Có phải ngôi nhà ẩy của bạn không?",
+            "Có phái ngôi nhà ấy của bạn không?",
+            "Có phải ngôi nhá ấy của bạn không?",
+            "Có phải ngôi nhà ấy của bạn không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 174.995708,
+        "end": 177.615708,
+        "correctAnswer": "Phải, ngôi nhà ấy của tôi.",
+        "translation": "是的，那栋房子是我的。",
+        "options": [
+            "Phải, ngôi nhà ấy cửa tôi.",
+            "Phãi, ngôi nhà ấy của tôi.",
+            "Phải, ngôi nha ấy của tôi.",
+            "Phải, ngôi nhà ấy của tôi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 178.315708,
+        "end": 179.815708,
+        "correctAnswer": "Bạn bao nhiêu tuổi?",
+        "translation": "你几岁了？",
+        "options": [
+            "Bản bao nhiêu tuổi?",
+            "Bạn bao nhiêu tuỏi?",
+            "Bạn bào nhiêu tuổi?",
+            "Bạn bao nhiêu tuổi?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 180.455708,
+        "end": 182.075708,
+        "correctAnswer": "Tôi hai mươi tuổi.",
+        "translation": "我二十岁。",
+        "options": [
+            "Tôi hai mười tuổi.",
+            "Tôi hai mươi tuỏi.",
+            "Tôi hai mươi tổi.",
+            "Tôi hai mươi tuổi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 182.645708,
+        "end": 184.615708,
+        "correctAnswer": "Xe của bạn có đẹp không?",
+        "translation": "你的车好看吗？",
+        "options": [
+            "Xe của bạn có đep không?",
+            "Xe của ban có đẹp không?",
+            "Xe của bạn có dẹp không?",
+            "Xe của bạn có đẹp không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 185.015708,
+        "end": 186.855708,
+        "correctAnswer": "Xe của tôi rất đẹp.",
+        "translation": "我的车非常漂亮。",
+        "options": [
+            "Xe của tôi rấc đẹp.",
+            "Xe của tôi rất đep.",
+            "Xe của tôi rất dẹp.",
+            "Xe của tôi rất đẹp."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 187.525708,
+        "end": 189.495708,
+        "correctAnswer": "Váy của tớ có đẹp không?",
+        "translation": "我的裙子好看吗？",
+        "options": [
+            "Váy của tớ có đep không?",
+            "Vái của tớ có đẹp không?",
+            "Váy của tỡ có đẹp không?",
+            "Váy của tớ có đẹp không?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 189.945708,
+        "end": 191.275708,
+        "correctAnswer": "Đẹp quá!",
+        "translation": "真好看！",
+        "options": [
+            "Đẹp quã!",
+            "Dẹp quá!",
+            "Đep quá!",
+            "Đẹp quá!"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 191.775708,
+        "end": 193.805708,
+        "correctAnswer": "Mẹ của bạn bao nhiêu tuổi?",
+        "translation": "你妈妈几岁了？",
+        "options": [
+            "Mẹ của bản bao nhiêu tuổi?",
+            "Mẹ của bạn bào nhiêu tuổi?",
+            "Mẹ của bạn bao nhiêu tuỏi?",
+            "Mẹ của bạn bao nhiêu tuổi?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 194.265708,
+        "end": 196.145708,
+        "correctAnswer": "Mẹ bạn bao nhiêu tuổi?",
+        "translation": "你妈妈几岁了？",
+        "options": [
+            "Mẹ bạn bào nhiêu tuổi?",
+            "Mẹ ban bao nhiêu tuổi?",
+            "Mẹ bạn bao nhiêu tuỏi?",
+            "Mẹ bạn bao nhiêu tuổi?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 196.525708,
+        "end": 198.735708,
+        "correctAnswer": "Mẹ tôi năm mươi lăm tuổi.",
+        "translation": "我妈妈五十五岁。",
+        "options": [
+            "Mẹ tôi năm muơi lăm tuổi.",
+            "Mẹ tôi năm mười lăm tuổi.",
+            "Mẹ tôi năm mươi lam tuổi.",
+            "Mẹ tôi năm mươi lăm tuổi."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 199.165708,
+        "end": 201.705708,
+        "correctAnswer": "Bố của bạn có mấy chiếc xe ô tô?",
+        "translation": "你爸爸有几辆汽车？",
+        "options": [
+            "Bố của bạn có mấy chiếc xê ô tô?",
+            "Bố của bạn có mấy chiếc xe ô tồ?",
+            "Bô của bạn có mấy chiếc xe ô tô?",
+            "Bố của bạn có mấy chiếc xe ô tô?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 202.245708,
+        "end": 204.645708,
+        "correctAnswer": "Bố bạn có mấy chiếc xe ô tô?",
+        "translation": "你爸爸有几辆汽车？",
+        "options": [
+            "Bố bạn có mấy chiếc xê ô tô?",
+            "Bố bạn có mấy chiếc xe ô tồ?",
+            "Bô bạn có mấy chiếc xe ô tô?",
+            "Bố bạn có mấy chiếc xe ô tô?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 205.185708,
+        "end": 207.845708,
+        "correctAnswer": "Bố tôi có bốn chiếc xe ô tô.",
+        "translation": "我爸爸有四辆汽车。",
+        "options": [
+            "Bố tôi có bốn chiếc xê ô tô.",
+            "Bố tôi có bốn chiếc xe ô tồ.",
+            "Bố tôi có bốn chiếc xe ô thô.",
+            "Bố tôi có bốn chiếc xe ô tô."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 208.275708,
+        "end": 210.595708,
+        "correctAnswer": "Lớp của bạn có bao nhiêu sinh viên.",
+        "translation": "你的班上有多少学生？",
+        "options": [
+            "Lớp của bạn có bào nhiêu sinh viên.",
+            "Lớp của bạn có bao nhiêu xinh viên.",
+            "Lớp của bạn có bao nhiêu sinh viền.",
+            "Lớp của bạn có bao nhiêu sinh viên."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 211.175708,
+        "end": 213.365708,
+        "correctAnswer": "Lớp bạn có bao nhiêu sinh viên?",
+        "translation": "你们班有多少学生？",
+        "options": [
+            "Lớp bạn có bào nhiêu sinh viên?",
+            "Lớp bạn có bao nhiêu xinh viên?",
+            "Lớp bạn có bao nhiêu sinh viền?",
+            "Lớp bạn có bao nhiêu sinh viên?"
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 213.875708,
+        "end": 216.405708,
+        "correctAnswer": "Lớp tôi có bốn mươi tư sinh viên.",
+        "translation": "我的班上有四十四名学生。",
+        "options": [
+            "Lớp tôi có bốn mười tư sinh viên.",
+            "Lớp tôi có bốn mươi tử sinh viên.",
+            "Lớp tôi có bốn mươi tư xinh viên.",
+            "Lớp tôi có bốn mươi tư sinh viên."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 216.855708,
+        "end": 218.825708,
+        "correctAnswer": "Nhà bạn có bao nhiêu người.",
+        "translation": "你家有几口人？",
+        "options": [
+            "Nhà bạn có bào nhiêu người.",
+            "Nhá bạn có bao nhiêu người.",
+            "Nhà bạn có bao nhiêu ngươi.",
+            "Nhà bạn có bao nhiêu người."
+        ]
+    },
+    {
+        "audioFile": "audio.mp3",
+        "start": 219.285708,
+        "end": 221.305708,
+        "correctAnswer": "Nhà tôi có 4 người.",
+        "translation": "我家有四口人。",
+        "options": [
+            "Nhà tôi có 4 ngươi.",
+            "Nhà tôi có 4 ngườì.",
+            "Nhà tôi có 4 ngừoi.",
+            "Nhà tôi có 4 người."
+        ]
+    }
+];
+
+        let currentIndex = 0;
+        let isFreeMode = true;
+        let correctCount = 0;
+        let isPlaying = false;
+        let correctSentences = new Set();
+        let wrongSentences = new Set();
+        let autoContinue = false;
+        let showAnswer = false;
+        let userAnswers = [];
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function init() {
+            updateSentenceDisplay();
+        }
+
+        function updateSentenceDisplay() {
+            sentenceNumber.value = currentIndex + 1;
+            indicator.style.background = '#ffffe0';
+            if (isFreeMode && showAnswer) {
+                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #85ae5f;">${sentences[currentIndex].translation}</div>
+                `;
+            } else {
+                indicator.innerHTML = '';
+            }
+            updateOptions();
+            if (!isFreeMode) updateScore();
+        }
+
+        function updateOptions() {
+            optionsContainer.innerHTML = '';
+            const shuffledOptions = shuffleArray(sentences[currentIndex].options);
+            shuffledOptions.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'optionBtn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function playCurrentSentence() {
+            if (isPlaying) audio.pause();
+            buttons.forEach(btn => btn.classList.add('disabled'));
+            sentenceNumber.disabled = true;
+            isPlaying = true;
+            audio.src = sentences[currentIndex].audioFile;
+            audio.currentTime = sentences[currentIndex].start;
+            audio.play().catch(error => {
+                console.error('Audio playback failed:', error);
+                alert('Vui lòng nhấn nút “再听一遍” để phát âm thanh.');
+                buttons.forEach(btn => btn.classList.remove('disabled'));
+                sentenceNumber.disabled = false;
+                isPlaying = false;
+            });
+
+            audio.ontimeupdate = () => {
+                if (audio.currentTime >= sentences[currentIndex].end) {
+                    audio.pause();
+                    audio.ontimeupdate = null;
+                    buttons.forEach(btn => btn.classList.remove('disabled'));
+                    sentenceNumber.disabled = false;
+                    isPlaying = false;
+                }
+            };
+        }
+
+        function moveSentence(direction) {
+            currentIndex = (currentIndex + direction + sentences.length) % sentences.length;
+            updateSentenceDisplay();
+            playCurrentSentence();
+        }
+
+        function checkAnswer(selectedAnswer) {
+            const correctAnswer = sentences[currentIndex].correctAnswer;
+            const optionButtons = optionsContainer.getElementsByClassName('optionBtn');
+            
+            // Clear previous styles
+            for (let btn of optionButtons) {
+                btn.classList.remove('correct', 'wrong');
+                btn.disabled = !isFreeMode; // Only disable buttons in Test Mode
+            }
+
+            // Find and style the selected button
+            for (let btn of optionButtons) {
+                if (btn.textContent === selectedAnswer) {
+                    if (selectedAnswer === correctAnswer) {
+                        indicator.style.background = '#B7D7AA';
+                                                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #000000;">${sentences[currentIndex].translation}</div>
+                `;
+                        btn.classList.add('correct');
+                        correctAudio.play().catch(error => {
+                            console.error('Correct audio playback failed:', error);
+                        });
+                    } else {
+                        indicator.style.background = '#CE6D5E';
+                                                indicator.innerHTML = `
+                    <div style="font-size: 18px; font-weight: bold; color: #000000;">${sentences[currentIndex].translation}</div>
+                `;
+                        btn.classList.add('wrong');
+                        wrongAudio.play().catch(error => {
+                            console.error('Wrong audio playback failed:', error);
+                        });
+                    }
+                }
+            }
+
+            if (!isFreeMode) {
+                userAnswers[currentIndex] = selectedAnswer;
+                if (selectedAnswer === correctAnswer && !correctSentences.has(currentIndex)) {
+                    correctCount++;
+                    correctSentences.add(currentIndex);
+                    wrongSentences.delete(currentIndex);
+                } else if (selectedAnswer !== correctAnswer && !correctSentences.has(currentIndex)) {
+                    wrongSentences.add(currentIndex);
+                }
+                updateScore();
+
+                // Auto-move to next sentence in Test Mode
+                const audioToWait = (selectedAnswer === correctAnswer) ? correctAudio : wrongAudio;
+                audioToWait.onended = () => {
+                    if (userAnswers.length === sentences.length) {
+                        showResults();
+                    } else {
+                        setTimeout(() => {
+                            moveSentence(1);
+                        }, 200);
+                    }
+                };
+            } else if (isFreeMode && autoContinue && selectedAnswer === correctAnswer) {
+                // Auto-move in Free Mode only if answer is correct and autoContinue is enabled
+                correctAudio.onended = () => {
+                    setTimeout(() => {
+                        moveSentence(1);
+                    }, 200);
+                };
+            } else {
+                correctAudio.onended = null;
+                wrongAudio.onended = null;
+            }
+        }
+
+        function updateScore() {
+            scoreDisplay.textContent = `${correctCount}/${sentences.length}`;
+            scoreDisplay.style.display = 'block'; // Hiển thị score trong Test Mode
+        }
+
+        function showResults() {
+            let resultText = `练习完成！\n正确答案数量：${correctCount}/${sentences.length}\n正确率：${((correctCount / sentences.length) * 100).toFixed(2)}%\n错误题目：`;
+            wrongSentences.forEach(index => {
+                resultText += `\n第${index + 1}题：\n你的选择：${userAnswers[index] || '未选择'}\n正确答案：${sentences[index].correctAnswer}\n`;
+            });
+            if (wrongSentences.size === 0) {
+                resultText += '\n全部正确！';
+            }
+            resultsDisplay.textContent = resultText;
+            resultsDisplay.style.display = 'block';
+        }
+
+        prevBtn.onclick = () => {
+            moveSentence(-1);
+        };
+
+        nextBtn.onclick = () => {
+            moveSentence(1);
+        };
+
+        replayBtn.onclick = () => {
+            playCurrentSentence();
+        };
+
+        freeModeBtn.onclick = () => {
+            isFreeMode = true;
+            freeModeBtn.classList.add('active-mode');
+            testModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = false;
+            autoContinueBtn.classList.remove('disabled');
+            showHideBtn.disabled = false;
+            showHideBtn.classList.remove('disabled');
+            scoreDisplay.style.display = 'none';
+            wrongSentencesDisplay.style.display = 'none';
+            resultsDisplay.style.display = 'none';
+            updateSentenceDisplay();
+        };
+
+        testModeBtn.onclick = () => {
+            isFreeMode = false;
+            testModeBtn.classList.add('active-mode');
+            freeModeBtn.classList.remove('active-mode');
+            autoContinueBtn.disabled = true;
+            autoContinueBtn.classList.add('disabled');
+            showHideBtn.disabled = true;
+            showHideBtn.classList.add('disabled');
+            showHideBtn.classList.remove('active-mode');
+            showAnswer = false;
+            scoreDisplay.style.display = 'block';
+            currentIndex = 0;
+            correctCount = 0;
+            correctSentences.clear();
+            wrongSentences.clear();
+            userAnswers = [];
+            for (let i = 0; i < sentences.length; i++) {
+                wrongSentences.add(i);
+            }
+            updateSentenceDisplay();
+        };
+
+        autoContinueBtn.onclick = () => {
+            if (isFreeMode) {
+                autoContinue = !autoContinue;
+                autoContinueBtn.classList.toggle('active-mode');
+                if (!autoContinue) {
+                    correctAudio.onended = null;
+                }
+            }
+        };
+
+        showHideBtn.onclick = () => {
+            if (isFreeMode) {
+                showAnswer = !showAnswer;
+                showHideBtn.classList.toggle('active-mode');
+                updateSentenceDisplay();
+            }
+        };
+
+        sentenceNumber.onchange = () => {
+            if (!isPlaying) {
+                const num = parseInt(sentenceNumber.value) - 1;
+                if (!isNaN(num) && num >= 0 && num < sentences.length) {
+                    currentIndex = num;
+                    updateSentenceDisplay();
+                    playCurrentSentence();
+                } else {
+                    alert(`输入范围： 1 到 ${sentences.length}`);
+                    updateSentenceDisplay();
+                }
+            }
+        };
+
+        sentenceNumber.onkeydown = (e) => {
+            if (!isPlaying) {
+                if (e.key === 'ArrowLeft') {
+                    moveSentence(-1);
+                }
+                if (e.key === 'ArrowRight') {
+                    moveSentence(1);
+                }
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>
